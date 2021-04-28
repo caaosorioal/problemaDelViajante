@@ -1,7 +1,10 @@
 #def softMax(array):
 #    return np.array([np.exp(x) / sum(np.exp(array))])
 
-class AGViajero():
+#def softMax(array):
+#    return np.array([np.exp(x) / sum(np.exp(array))])
+
+class AGViajero:
     def __init__(self, poblacionInicial, tasaMutacion, maxGeneraciones, tolerancia):
         self.poblacionInicial = poblacionInicial
         self.tasaMutacion = tasaMutacion
@@ -93,7 +96,7 @@ class AGViajero():
         else:
             return self.mutacion(hijosFinales[1])    
         
-    def obtenerTrayectoriaOptimaGA(self, matrizDistancias):
+    def ejecutarGA(self, matrizDistancias):
         self.matrizDistancias = matrizDistancias
         self.n = matrizDistancias.shape[0]
         poblacionActual = self.generarPoblacionInicial()
@@ -102,7 +105,7 @@ class AGViajero():
         mediasFitness = [np.mean(fitness)]
         generacion = 0
         mejora = 1000
-        mejoresTrayectorias = []
+        self.mejoresTrayectorias = []
         
         while (generacion <= self.maxGeneraciones) and (mejora > self.tolerancia):
             hijos = []
@@ -123,31 +126,43 @@ class AGViajero():
             idMejorTrayectoria = np.argmax([1/self.fitness(trayectoria) for trayectoria in poblacionActual])
             mejorTrayectoria = poblacionActual[idMejorTrayectoria]
                 
-            mejoresTrayectorias.append((1/self.fitness(mejorTrayectoria), mejorTrayectoria))
-            
+            self.mejoresTrayectorias.append((1/self.fitness(mejorTrayectoria), mejorTrayectoria))     
             clear_output(wait = True)
             print(f'Generación {generacion}, media de adecuación: {np.mean(fitness)}')
-
-        self.evaluacion = mediasFitness
+            
+        evaluacion = mediasFitness
         self.maxGeneraciones = generacion
-        longitudMejores = list(zip(*mejoresTrayectorias))[0]
+        longitudMejores = list(zip(*self.mejoresTrayectorias))[0]
         indiceLongitudMejor = longitudMejores.index(max(longitudMejores))
-        mejorTrayectoriaF = mejoresTrayectorias[indiceLongitudMejor][1]
+        self.mejorTrayectoriaF = self.mejoresTrayectorias[indiceLongitudMejor][1]
         
-        problema.dibujarTrayectoria(mejorTrayectoriaF)
-        return mejorTrayectoriaF
+        self.mejoresTrayectorias.append((1, self.mejorTrayectoriaF))
+        problema.dibujarTrayectoria(self.mejorTrayectoriaF)
+        return self.mejorTrayectoriaF, evaluacion
     
-    def metricaEvaluacion(self):
+    def metricaEvaluacion(self, mediasFitness):
         figura, ax = plt.subplots(figsize = (12,8))
         ax.set_title('Métrica de la función de adecuación en función de la generación',
                     fontsize = 15)
         
-        x = np.array(range(len(self.evaluacion)))
-        y = self.evaluacion
+        x = np.array(range(len(mediasFitness)))
+        y = mediasFitness
                      
         plt.plot(x,y, color = 'red')
         plt.grid()
         plt.show()
+        
+    def mostrarEvolucion(self, mejorTrayectoriaGA, tasaRefresco = 1):
+        %matplotlib inline
+        for i, trayectoria in enumerate(self.mejoresTrayectorias):
+            titulo = f'Mejor trayectoria - Generación {i}'
+            if i % tasaRefresco == 0:
+                problema.dibujarTrayectoria(trayectoria[1], titulo = titulo)
+                time.sleep(0.1)
+                clear_output(wait = True)
+            else:
+                pass
+        problema.dibujarTrayectoria(self.mejorTrayectoriaF, titulo = 'Trayectoria final')
         
 if __name__ == '__main__':
     pass

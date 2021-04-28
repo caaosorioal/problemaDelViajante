@@ -20,21 +20,32 @@ def calcularDistancia(punto1, punto2):
     else:
         return np.sqrt((punto1[0]-punto2[0])**2 + (punto1[1]-punto2[1])**2)
 
-class problemaViajero():
+class problemaViajero:
     ''' Clase de problemaViajero que consiste en la
         inicialización del problema. Se generan unos
         puntos al azar en el plano que harán las veces de
         ciudades'''
     
-    def __init__(self, n):
+    def __init__(self, n, tipoPuntos = 'aleatorio'):
         self.n = n
-        self.x, self.y = np.random.random(size = (2, self.n))
-    
+        if tipoPuntos == 'aleatorio':
+            self.x, self.y = np.random.random(size = (2, self.n))
+        elif tipoPuntos == 'clusters':
+            X, _ = make_blobs(n_samples = n, centers = 3, n_features = 2,
+                  random_state = random.randint(0, 10000))
+            self.x, self.y = X[:, 0], X[:, 1]
+        else:
+            raise Exception('Generación de puntos no válida')
+            
     def graficoProblema(self):
+        %matplotlib inline
         ''' Gráfica de los puntos '''
         
         plt.figure(figsize = (12, 8))
-        plt.scatter(self.x, self.y, color = 'black')
+        plt.scatter(self.x, 
+                    self.y, 
+                    color = 'red',
+                    s = 70)
         
         for i in range(self.n):
             x0 = self.x[i]
@@ -43,6 +54,9 @@ class problemaViajero():
         
         plt.title(f'Figura de los puntos {self.n} escogidos',
                  fontsize = 15)
+        
+        plt.xticks([])
+        plt.yticks([])
         plt.show()
     
     def matrizDistancia(self):
@@ -57,7 +71,7 @@ class problemaViajero():
         
         return np.matrix(filas)
     
-    def dibujarTrayectoria(self, trayectoria = []):
+    def dibujarTrayectoria(self, trayectoria = [], titulo = ''):
         ''' Dibujo que une los puntos. Si no se entrega
             una trayectoria, se dibuja una aleatoriamente'''
         
@@ -67,6 +81,11 @@ class problemaViajero():
         else:
             strGrafica = 'Trayectoria aleatoria'
             permutacion = np.random.permutation(self.n)
+        
+        if titulo != '':
+            strGrafica = titulo
+        else:
+            pass
         
         figura, ax = plt.subplots(figsize = (12,8))
         ax.set_title(strGrafica,
@@ -84,7 +103,7 @@ class problemaViajero():
                                  problema.y[permutacion[i + 1]]
                                 ]
 
-                ax.plot(ejeHorizontales, ejeVerticales, 'r-')
+                ax.plot(ejeHorizontales, ejeVerticales, 'r-', color = 'black', zorder = 1)
             except IndexError:
                 ejeHorizontales = [
                                    problema.x[permutacion[i]], 
@@ -95,10 +114,18 @@ class problemaViajero():
                                  problema.y[permutacion[i]], 
                                  problema.y[permutacion[0]]
                                 ]
-                ax.plot(ejeHorizontales, ejeVerticales, 'r-')
+                ax.plot(ejeHorizontales, ejeVerticales, 'r-', color = 'black',zorder = 1)
 
-        plt.scatter(problema.x, problema.y, color = 'black')
+        plt.scatter(problema.x, 
+                    problema.y, 
+                    color = 'red',
+                    s = 70,
+                    zorder = 2)
         
+        plt.xticks([])
+        plt.yticks([])
+        plt.show()
+
     
     def calcularLongitudTrayectoria(self, trayectoria):
         ''' Dada una trayectoria, se calcula
@@ -149,8 +176,9 @@ class problemaViajero():
             else:
                 return dict(zip(np.array(etiquetas), longitud))
     
+    
 if __name__ == '__main__':
     n = 10
-    problema = problemaViajero(n)
+    problema = problemaViajero(n, tipoPuntos = 'aleatorio')
     problema.graficoProblema()
     
