@@ -49,10 +49,9 @@ class AGViajero:
         return trayectoria
 
     def crossover(self, padres):
-        corte1, corte2 = 0, 0
-        while corte1 >= corte2:
-            corte1, corte2 = np.random.randint(1, self.n - 1), np.random.randint(1, self.n - 1)
-
+        parejaAleatoria = sorted(np.random.choice(np.arange(1, self.n - 1 ), 2, replace = False))
+        corte1, corte2 = parejaAleatoria
+        
         padresPartes = {}
         for npadre in range(2):
             padresPartes[npadre] = [padres[npadre][0:corte1], 
