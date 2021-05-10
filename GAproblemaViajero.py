@@ -1,9 +1,6 @@
 #def softMax(array):
 #    return np.array([np.exp(x) / sum(np.exp(array))])
 
-#def softMax(array):
-#    return np.array([np.exp(x) / sum(np.exp(array))])
-
 class AGViajero:
     def __init__(self, poblacionInicial, tasaMutacion, maxGeneraciones, tolerancia):
         self.poblacionInicial = poblacionInicial
